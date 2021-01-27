@@ -1,0 +1,128 @@
+function! ConfigureView()
+    set number
+    " Включить подсветку синтаксиса
+    syntax on
+    " Поиск по набору текста (очень полезная функция)
+    set incsearch
+    " Подсвечивание поиска
+    set hlsearch
+    " умная зависимость от регистра %)
+    set ignorecase
+    set smartcase
+    "match errorMsg /[\t]/
+    " Кодировка текста по умолчанию
+    set termencoding=utf8
+    " Включаем несовместимость настроек с Vi (ибо Vi нам и не понадобится).
+    set nocompatible
+    " Показывать положение курсора всё время.
+    set ruler
+    " Показывать незавершённые команды в статусбаре
+    set showcmd
+    " Фолдинг по отсупам
+    set foldenable
+    set foldlevel=100
+    set foldmethod=indent
+    " Выключаем надоедливый "звонок"
+    set noerrorbells visualbell t_vb=
+    autocmd GUIEnter * set visualbell t_vb=
+    " Поддержка мыши
+    set mouse=a
+    set mousemodel=popup
+    " Не выгружать буфер, когда переключаемся на другой
+    " Это позволяет редактировать несколько файлов в один и тот же момент без необходимости сохранения каждый раз  когда переключаешься между ними
+    set hidden
+    " Скрыть панель в gui версии ибо она не нужна
+    set guioptions-=T
+    " Сделать строку команд высотой в одну строку
+    set ch=1
+    " Скрывать указатель мыши, когда печатаем
+    set mousehide
+    " Включить автоотступы
+    set autoindent
+    " Не переносить строки
+    set nowrap
+    " Преобразование Таба в пробелы
+    set expandtab
+    " Размер табуляции по умолчанию
+    set shiftwidth=4
+    set softtabstop=4
+    set tabstop=4
+    " Формат строки состояния
+    set statusline=%<%f%h%m%r\ %b\ %{&encoding}\ 0x\ \ %l,%c%V\ %P
+    set laststatus=2
+    " Включаем "умные" отступы ( например, авто отступ после {)
+    set smartindent
+    " Отображение парных символов
+    set showmatch
+    " Навигация с учетом русских символов
+    set iskeyword=@,48-57,_,192-255
+    " Удаление символов бэкспэйсом в Windows
+    set backspace=indent,eol,start
+    set history=200
+    set wildmenu
+    set list listchars=tab:→\ ,trail:·
+    filetype plugin on
+
+    " Тема для редактора
+    colorscheme sublimemonokai
+
+    let g:airline_powerline_fonts = 1 "Включить поддержку Powerline шрифтов
+    let g:airline#extensions#keymap#enabled = 0 "Не показывать текущий маппинг
+    let g:airline_section_z = "\ue0a1:%l/%L Col:%c" "Кастомная графа положения   курсора
+    let g:Powerline_symbols='unicode' "Поддержка unicode
+    let g:airline#extensions#xkblayout#enabled = 0 "Про это позже расскажу
+    let g:slime_target = "tmux" " 
+endfunc
+
+function! BindKeys()
+
+    " просмотр списка буферов
+    nmap <C-b> <Esc>:BufExplorer<cr>
+    vmap <C-b> <esc>:BufExplorer<cr>
+    imap <C-b> <esc><esc>:BufExplorer<cr>
+    inoremap <Tab> <C-R>=SuperCleverTab()<cr>
+
+    " Переключение между окнами
+    map <C-j> <C-W>j
+    map <C-k> <C-W>k
+    map <C-h> <C-W>h
+    map <C-l> <C-W>l
+
+    " Копирование и вставка
+    inoremap <C-v> <ESC>"+pa
+    vnoremap <C-c> "+y
+    vnoremap <C-d> "+d
+
+    " Назначаем клавишу открытия 
+    nnoremap <C-t> :NERDTreeToggle<CR>
+
+    nnoremap <leader>ld :LivedownToggle<CR>
+    nnoremap <esc><esc> :noh<return>
+endfunc
+
+function! SuperCleverTab()
+    if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
+        return "\<Tab>"
+    else
+        return "\<C-p>"
+    endif
+endfunction
+
+function! PlugConf()
+       call plug#begin('~/.vim/plugged')
+    "   " Initialize plugin system
+       Plug 'jlanzarotta/bufexplorer' " Отображает открытые буверы
+       Plug 'ErichDonGubler/vim-sublime-monokai' " Установка темы
+       Plug 'vim-airline/vim-airline' " Красивая строка состояния
+       Plug 'jpalardy/vim-slime' " Передача команд из вима в терминал Ctrl-C-C
+       Plug 'scrooloose/nerdtree' " nerdtree
+       Plug 'shime/vim-livedown' "Нужно установить  npm install -g livedown  запуск nnoremap <leader>ld :LivedownToggle<CR>
+       Plug 'preservim/nerdcommenter' " Комментарии кода <leader>cc
+       call plug#end()
+endfunc
+
+
+call PlugConf()
+call ConfigureView()
+call BindKeys()
+call SuperCleverTab()
